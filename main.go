@@ -28,8 +28,13 @@ import (
 func main() {
 	godotenv.Load()
 
-	acls := "frontend http-in\n    bind *:80\n"
-	uses := "\n"
+	acls := "defaults\n"
+	acls += "    timeout connect 5s\n"
+	acls += "    timeout client 50s\n"
+	acls += "    timeout server 50s\n\n"
+
+	acls += "frontend http-in\n    bind *:80\n"
+	uses := ""
 	backends := ""
 
 	idx_rule := 0
