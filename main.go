@@ -29,11 +29,12 @@ func main() {
 	godotenv.Load()
 
 	acls := "defaults\n"
+	acls += "    log stdout format raw local0\n"
 	acls += "    timeout connect 5s\n"
 	acls += "    timeout client 50s\n"
 	acls += "    timeout server 50s\n\n"
 
-	acls += "frontend http-in\n    bind *:80\n"
+	acls += "frontend http-in\n    mode http\n    bind *:80\n\n"
 	uses := ""
 	backends := ""
 
@@ -47,12 +48,12 @@ func main() {
 				for idx, ip := range ips {
 					if idx == 0 {
 						acls += fmt.Sprintf("    acl host_d%d hdr(host) -i %s\n", idx_rule, ip)
-						acls += fmt.Sprintf("    http-request set-header Host %s if host_d%d\n", ip, idx_rule)
 						uses += fmt.Sprintf("    use_backend be_d%d if host_d%d\n", idx_rule, idx_rule)
-						backends += fmt.Sprintf("\nbackend be_d%d\n", idx_rule)
+						backends += fmt.Sprintf("\nbackend be_d%d\n    mode http\n", idx_rule)
 					} else {
 						// fmt.Println("to", ip)
 						backends += fmt.Sprintf("    server d%dm%d %s\n", idx_rule, idx, ip)
+						backends += fmt.Sprintf("    http-request set-header Host %s\n", ip)
 					}
 				}
 				fmt.Println()
