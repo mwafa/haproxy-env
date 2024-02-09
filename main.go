@@ -47,6 +47,7 @@ func main() {
 				for idx, ip := range ips {
 					if idx == 0 {
 						acls += fmt.Sprintf("    acl host_d%d hdr(host) -i %s\n", idx_rule, ip)
+						acls += fmt.Sprintf("    http-request set-header Host %s if host_d%d\n", ip, idx_rule)
 						uses += fmt.Sprintf("    use_backend be_d%d if host_d%d\n", idx_rule, idx_rule)
 						backends += fmt.Sprintf("\nbackend be_d%d\n", idx_rule)
 					} else {
